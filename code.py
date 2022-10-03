@@ -165,6 +165,7 @@ def set_color(NEW_COLOR):
 # CUSTOMIZE YOUR COLOR HERE:
 # (red, green, blue) -- each 0 (off) to 255 (brightest)
 RED_COLOR = (255, 0, 0)  # red
+PINK_COLOR = (235, 20, 127) # pink
 PURPLE_COLOR = (100, 0, 255)  # purple
 CYAN_COLOR = (0, 100, 255)  # cyan
 GREEN_COLOR = (0, 255, 0)  # cyan
@@ -193,6 +194,9 @@ while True:
 
         # Rotate through colours and button colours
         if COLOR == RED_COLOR:
+            print("Changed to PINK")
+            set_color(PINK_COLOR)
+        elif COLOR == PINK_COLOR:
             print("Changed to PURPLE")
             set_color(PURPLE_COLOR)
         elif COLOR == PURPLE_COLOR:
