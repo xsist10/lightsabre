@@ -11,8 +11,9 @@ import neopixel
 import adafruit_lis3dh
 from adafruit_led_animation.animation.rainbow import Rainbow
 
-HIT_THRESHOLD = 350  # 250
-SWING_THRESHOLD = 125
+HIT_THRESHOLD = 400  # 250
+SWING_THRESHOLD = 120
+BUTTON_IS_TOGGLE = True
 
 NUM_PIXELS = 60  # NeoPixel strip length (in pixels)
 NEOPIXEL_PIN = board.D5
@@ -177,43 +178,63 @@ COLOR_SWING = COLOR
 set_color(COLOR)
 COLOR_HIT = (255, 255, 255)  # "hit" color is white
 rainbow = Rainbow(strip, speed=0.1, period=2)
-# while True:
-#     rainbow.animate()
 
 button_push = False
-while True:
-    # toggle.value is true, means the button has been released. I think we got the wires mixed up
-    if mode != 0 and toggle.value:
-        button_push = False
 
-    # toggle.value is false, and we haven't already processed a button push,
-    if mode != 0 and not toggle.value and not button_push:
-        # Mark the button push detected
-        button_push = True
-        print("Button pushed")
 
-        # Rotate through colours and button colours
-        if COLOR == RED_COLOR:
-            print("Changed to PINK")
-            set_color(PINK_COLOR)
-        elif COLOR == PINK_COLOR:
-            print("Changed to PURPLE")
-            set_color(PURPLE_COLOR)
-        elif COLOR == PURPLE_COLOR:
-            print("Changed to CYAN")
-            set_color(CYAN_COLOR)
-        elif COLOR == CYAN_COLOR:
-            print("Changed to GREEN")
-            set_color(GREEN_COLOR)
-        elif COLOR == GREEN_COLOR:
-            print("Changed to Rainbow")
-            set_color(RAINBOW_COLOR)
-        else:
-            print("Changed to RED")
-            set_color(RED_COLOR)
+def toggle_color():
+    # Rotate through colours and button colours
+    if COLOR == RED_COLOR:
+        print("Changed to PINK")
+        set_color(PINK_COLOR)
+    elif COLOR == PINK_COLOR:
+        print("Changed to PURPLE")
+        set_color(PURPLE_COLOR)
+    elif COLOR == PURPLE_COLOR:
+        print("Changed to CYAN")
+        set_color(CYAN_COLOR)
+    elif COLOR == CYAN_COLOR:
+        print("Changed to GREEN")
+        set_color(GREEN_COLOR)
+    elif COLOR == GREEN_COLOR:
+        print("Changed to Rainbow")
+        set_color(RAINBOW_COLOR)
+    else:
+        print("Changed to RED")
+        set_color(RED_COLOR)
 
+    # Only render if we're not in mode 0
+    if mode != 0:
         strip.fill(COLOR_IDLE)  # Set to idle color
         strip.show()
+
+
+while True:
+    # We have two types of buttons, toggle and push
+    # toggle.value is true, means the button has been released. I think we got the wires mixed up
+    if BUTTON_IS_TOGGLE:
+        if not button_push and toggle.value:
+            # Mark the button push detected
+            button_push = True
+            print("Button pushed")
+            toggle_color()
+
+        # toggle.value is false, and we haven't already processed a button push,
+        if not toggle.value and button_push:
+            # Mark the button as released
+            button_push = False
+            print("Button released")
+            toggle_color()
+    else:
+        if toggle.value:
+            button_push = False
+
+        # toggle.value is false, and we haven't already processed a button push,
+        if not toggle.value and not button_push:
+            # Mark the button push detected
+            button_push = True
+            print("Button pushed")
+            toggle_color()
 
     if not switch.value:  # button pressed?
         if mode == 0:  # If currently off...
@@ -261,7 +282,7 @@ while True:
                     strip.show()
                 mode = 1  # IDLE mode now
 
-    #battery_voltage = get_voltage(vbat_voltage)
+    #battery_voaltage = get_voltage(vbat_voltage)
     #print("VBat voltage: {:.2f}".format(battery_voltage))
     #if battery_voltage > 4:
     #    set_button_color(False, True, False)
